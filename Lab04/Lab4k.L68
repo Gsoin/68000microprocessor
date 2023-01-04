@@ -1,0 +1,37 @@
+00008000 Starting Address
+Assembler used: EASy68K Editor/Assembler v5.16.01
+Created On: 12/1/2022 3:06:08 PM
+
+00000000                             1  *-----------------------------------------------------------
+00000000                             2  * Title      : If Statement
+00000000                             3  * Written by : Gunteshwar Soin
+00000000                             4  * Date       : 19/10/2022
+00000000                             5  * Description: runs a for loop
+00000000                             6  *-----------------------------------------------------------
+00008000                             7          ORG     $8000
+00008000  3239 00009000              8  START   MOVE.W  A,D1
+00008006                             9  
+00008006  0C41 0032                 10  LOOP    CMPI.W  #50,D1  ;D1 < 50
+0000800A  6400 000C                 11          BHS     EXIT    ;break loop if false
+0000800E  5279 00009000             12          ADD.W   #1,A
+00008014  5241                      13          ADD.W   #1,D1
+00008016  60EE                      14          BRA     LOOP
+00008018                            15  
+00008018  4241                      16  EXIT    CLR.W   D1
+0000801A  FFFF FFFF                 17          SIMHALT
+0000801E                            18  
+00009000                            19          ORG     $9000
+00009000= 000A                      20  A       DC.W    10
+00009002                            21          END    START
+
+No errors detected
+No warnings generated
+
+
+SYMBOL TABLE INFORMATION
+Symbol-name         Value
+-------------------------
+A                   9000
+EXIT                8018
+LOOP                8006
+START               8000

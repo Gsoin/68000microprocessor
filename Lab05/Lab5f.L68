@@ -1,0 +1,276 @@
+00008000 Starting Address
+Assembler used: EASy68K Editor/Assembler v5.16.01
+Created On: 12/1/2022 3:17:33 PM
+
+00000000                             1  *-----------------------------------------------------------
+00000000                             2  * Title      : Lab5f
+00000000                             3  * Written by : Gunteshwar Soin
+00000000                             4  * Date       : 01/11/2022
+00000000                             5  * Description: input list of nums and display
+00000000                             6  *              min, max, and avg
+00000000                             7  *-----------------------------------------------------------
+00000000                             8          
+00008000                             9          ORG     $8000
+00008000                            10  
+00008000                            11  **** Main Code *****
+00008000                            12  
+00008000  4879 00009000             13  MAIN    PEA     LIST                  ;push pointer to list   at location 10(A7)
+00008006  3F3C 9028                 14          MOVE.W  #LENGTH,-(A7)         ;push length of list    at location  8(A7)
+0000800A  4879 0000902A             15          PEA     STRUCT                ;push pointer to struct at location  4(A7)
+00008010                            16          
+00008010                            17          *MOVE.L  #4,D0                ;task number for reading a signed number entered
+00008010                            18          *MOVE.L  #13,D0               ;task number for displaying string
+00008010                            19          *MOVE.L  #14,D0               ;task number for displaying string without newline
+00008010                            20          *LEA     MSG0,A1              ;point to MSG0
+00008010                            21          *TRAP    #15                  ;system call
+00008010                            22          *
+00008010                            23          *MOVE.L  #4,D0                ;task number for reading a signed number entered
+00008010                            24          *TRAP    #15                  ;system call
+00008010                            25          
+00008010  6100 000E                 26          BSR     DATA                  ;get data
+00008014  6100 0080                 27          BSR     STATS                 ;calculate max min avg
+00008018  6100 00DC                 28          BSR     DIS                   ;display data
+0000801C                            29          
+0000801C  FFFF FFFF                 30          SIMHALT
+00008020                            31  
+00008020                            32  **** Subroutine: int get_data(*list)    ****
+00008020                            33  *          ARG1: *LIST at 10(A7)           *
+00008020                            34  *   Returns LENGTH at 8(A7)                *
+00008020                            35  ********************************************   
+00008020                            36          
+00008020                            37          * display enter num of vals message
+00008020  700E                      38  DATA    MOVE.L  #14,D0               ;task number for displaying string without newline
+00008022  43F9 0000805E             39          LEA     MSG0,A1              ;point to MSG0
+00008028  4E4F                      40          TRAP    #15                  ;system call
+0000802A                            41          
+0000802A                            42          * get num input from user
+0000802A  7004                      43          MOVE.L  #4,D0                ;task number for reading a signed number entered
+0000802C  4E4F                      44          TRAP    #15                  ;system call
+0000802E                            45          
+0000802E                            46          * branch back if num is not in range 1-10
+0000802E  0C81 00000001             47          CMPI.L  #1,D1                ;compare D1 to 1
+00008034  6DEA                      48          BLT     DATA                 ;branch back if D1<1
+00008036  0C81 0000000A             49          CMPI.L  #10,D1               ;compare D1 to 1
+0000803C  6EE2                      50          BGT     DATA                 ;branch back if D1>10
+0000803E                            51          
+0000803E                            52          * set counter to D2
+0000803E  2401                      53          MOVE.L  D1,D2                ;set counter to D2
+00008040  3F42 0008                 54          MOVE.W  D2,8(A7)             ;set counter in stack
+00008044  246F 000A                 55          MOVE.L  10(A7),A2             ;move list pointer to A2
+00008048                            56          
+00008048                            57          
+00008048                            58          * display enter num message
+00008048  700E                      59  LOOP1   MOVE.L  #14,D0               ;task number for displaying string without newline
+0000804A  43F9 00008086             60          LEA     MSG1,A1              ;point to MSG0
+00008050  4E4F                      61          TRAP    #15                  ;system call
+00008052                            62          
+00008052                            63          * get num input from user
+00008052  7004                      64          MOVE.L  #4,D0                ;task number for reading a signed number entered
+00008054  4E4F                      65          TRAP    #15                  ;system call
+00008056                            66          
+00008056                            67          * add num to list
+00008056  24C1                      68          MOVE.L  D1,(A2)+             ;add num to list
+00008058                            69          
+00008058                            70          * branch back if counter > 0
+00008058  5382                      71          SUB.L   #1,D2                ;decrement loop counter
+0000805A  66EC                      72          BNE     LOOP1                ;branch back if counter>0
+0000805C                            73          
+0000805C                            74          * end funciton
+0000805C  4E75                      75          RTS                          ;return
+0000805E                            76          
+0000805E                            77          
+0000805E= 45 6E 74 65 72 20 ...     78  MSG0    DC.B      'Enter number of values in list (1-10): ',0
+00008086= 45 6E 74 65 72 20 ...     79  MSG1    DC.B      'Enter number: ',0
+00008095                            80  
+00008095                            81  **** Subroutine: int Statistics(int number,*list,*struct) ****
+00008095                            82  *          ARG1: *LIST   at  10(A7)                          *
+00008095                            83  *          ARG2: LENGTH  at  8(A7)                           *
+00008095                            84  *          ARG3: *struct at  4(A7)                           *
+00008095                            85  **************************************************************
+00008095                            86          *initialize registers
+00008096  342F 0008                 87  STATS   MOVE.W  8(A7),D2             ;initiaize loop counter
+0000809A  246F 000A                 88          MOVE.L  10(A7),A2            ;initilize pointer to list
+0000809E  266F 0004                 89          MOVE.L  4(A7),A3             ;initilize pointer to struct
+000080A2                            90          
+000080A2                            91          *compute maximum
+000080A2  261A                      92  MAX     MOVE.L  (A2)+,D3             ;initialize max
+000080A4  5382                      93          SUB.L   #1,D2                ;decrement loop counter
+000080A6  6700 0012                 94          BEQ     MIN                  ;counter = 0? yes, then go min
+000080AA                            95          
+000080AA                            96          *compare max
+000080AA  B69A                      97  LOOP2   CMP.L   (A2)+,D3             ;compare D3 to (A2)
+000080AC  6C00 0006                 98          BGE     NOMAX                ;branch to skip update max if D3>=(A2)
+000080B0                            99          
+000080B0                           100          *update max
+000080B0  262A FFFC                101          MOVE.L  -4(A2),D3              ;set new max
+000080B4                           102          
+000080B4                           103          * branch back if counter > 0
+000080B4  5382                     104  NOMAX   SUB.L   #1,D2                ;decrement loop counter
+000080B6  66F2                     105          BNE     LOOP2                ;branch back if counter>0
+000080B8                           106          
+000080B8                           107          *store at struct[0]
+000080B8  26C3                     108          MOVE.L  D3,(A3)+
+000080BA                           109          
+000080BA                           110          
+000080BA                           111          *compute minimum
+000080BA  342F 0008                112  MIN     MOVE.W  8(A7),D2             ;initiaize loop counter
+000080BE  246F 000A                113          MOVE.L  10(A7),A2            ;initilize pointer to list
+000080C2                           114          
+000080C2  261A                     115          MOVE.L  (A2)+,D3             ;initialize min
+000080C4  5382                     116          SUB.L   #1,D2                ;decrement loop counter
+000080C6  6700 0012                117          BEQ     AVG                  ;counter = 0? yes, then go avg
+000080CA                           118  
+000080CA                           119          *compare min
+000080CA  B69A                     120  LOOP3   CMP.L   (A2)+,D3             ;compare D3 to (A2)
+000080CC  6F00 0006                121          BLE     NOMIN                ;branch to skip update min if D3<=(A2)
+000080D0                           122          
+000080D0                           123          *update min
+000080D0  262A FFFC                124          MOVE.L  -4(A2),D3            ;set new min
+000080D4                           125          
+000080D4                           126          * branch back if counter > 0
+000080D4  5382                     127  NOMIN   SUB.L   #1,D2                ;decrement loop counter
+000080D6  66F2                     128          BNE     LOOP3                ;branch back if counter>0
+000080D8                           129          
+000080D8                           130          *store at struct[1]
+000080D8  26C3                     131          MOVE.L  D3,(A3)+
+000080DA                           132          
+000080DA                           133          
+000080DA                           134          *compute average
+000080DA  342F 0008                135  AVG     MOVE.W  8(A7),D2             ;initiaize loop counter
+000080DE  246F 000A                136          MOVE.L  10(A7),A2            ;initilize pointer to list
+000080E2  4283                     137          CLR.L   D3                   ;set sum to zero
+000080E4                           138          
+000080E4                           139          *loop and get sum in D3
+000080E4  D69A                     140  LOOP4   ADD.L   (A2)+,D3             ;add val to sum
+000080E6                           141  
+000080E6                           142          * branch back if counter > 0
+000080E6  5382                     143          SUB.L   #1,D2                ;decrement loop counter
+000080E8  66FA                     144          BNE     LOOP4                ;branch back if counter>0
+000080EA                           145          
+000080EA                           146          *divide to get avg
+000080EA  342F 0008                147          MOVE.W  8(A7),D2             ;initiaize loop counter
+000080EE  87C2                     148          DIVS    D2,D3                ;compute remainder and quotient
+000080F0  4843                     149          SWAP    D3                   ;store as (quotient and remainder)
+000080F2                           150          
+000080F2                           151          *store (quotient and remainder) at struct[2]
+000080F2  26C3                     152          MOVE.L  D3,(A3)+
+000080F4                           153          
+000080F4                           154          * end funciton
+000080F4  4E75                     155          RTS                          ;return
+000080F6                           156          
+000080F6                           157          
+000080F6                           158  
+000080F6                           159  **** Subroutine: display(int max, int min, int quotient, int remainder) ****
+000080F6                           160  *          ARG1: *struct at 4(A7)                                          *
+000080F6                           161  *   Returns average in data register D0                                    *
+000080F6                           162  ****************************************************************************
+000080F6                           163          
+000080F6                           164          *initialize values
+000080F6  266F 0004                165  DIS     MOVE.L  4(A7),A3             ;initilize pointer to struct
+000080FA                           166          
+000080FA                           167          *display minimum 4(A3)
+000080FA  222B 0004                168          MOVE.L  4(A3),D1             ;initilize min in D1
+000080FE  700E                     169          MOVE.L  #14,D0               ;task number for displaying string without newline
+00008100  43F9 0000817D            170          LEA     MSGMIN,A1            ;point to MSGMIN
+00008106  4E4F                     171          TRAP    #15                  ;system call
+00008108  7003                     172          MOVE.L  #3,D0                ;task 3 to display number of keyboard
+0000810A  4E4F                     173          TRAP    #15                  ;system call
+0000810C                           174          *display newline
+0000810C  700D                     175          MOVE.L  #13,D0               ;task number for displaying string
+0000810E  43F9 00008193            176          LEA     EMPTY,A1             ;point to EMPTY
+00008114  4E4F                     177          TRAP    #15                  ;system call
+00008116                           178          
+00008116                           179          *display maximum  (A3)
+00008116  2213                     180          MOVE.L  (A3),D1              ;initilize max in D1
+00008118  700E                     181          MOVE.L  #14,D0               ;task number for displaying string without newline
+0000811A  43F9 00008172            182          LEA     MSGMAX,A1            ;point to MSGMAX
+00008120  4E4F                     183          TRAP    #15                  ;system call
+00008122  7003                     184          MOVE.L  #3,D0                ;task 3 to display number of keyboard
+00008124  4E4F                     185          TRAP    #15                  ;system call
+00008126                           186          *display newline
+00008126  700D                     187          MOVE.L  #13,D0               ;task number for displaying string
+00008128  43F9 00008193            188          LEA     EMPTY,A1             ;point to EMPTY
+0000812E  4E4F                     189          TRAP    #15                  ;system call
+00008130                           190          
+00008130                           191          *display average
+00008130  4281                     192          CLR.L   D1                   ;clear D1
+00008132  322B 0008                193          MOVE.W  8(A3),D1             ;initilize quotient in D1
+00008136  700E                     194          MOVE.L  #14,D0               ;task number for displaying string without newline
+00008138  43F9 00008188            195          LEA     MSGAVG,A1            ;point to MSGAVG
+0000813E  4E4F                     196          TRAP    #15                  ;system call
+00008140  7003                     197          MOVE.L  #3,D0                ;task 3 to display number of keyboard
+00008142  4E4F                     198          TRAP    #15                  ;system call
+00008144                           199          *display space
+00008144  700E                     200          MOVE.L  #14,D0               ;task number for displaying string without newline
+00008146  43F9 00008193            201          LEA     EMPTY,A1             ;point to EMPTY
+0000814C  4E4F                     202          TRAP    #15                  ;system call
+0000814E                           203          *display remainder
+0000814E  322B 000A                204          MOVE.W  10(A3),D1             ;initilize remainder in D1
+00008152  7003                     205          MOVE.L  #3,D0                ;task 3 to display number of keyboard
+00008154  4E4F                     206          TRAP    #15                  ;system call
+00008156                           207          *display /
+00008156  323C 002F                208          MOVE.W  #47,D1               ;initilize / in D1
+0000815A  7006                     209          MOVE.L  #6,D0                ;task 6 to display a single ascii character
+0000815C  4E4F                     210          TRAP    #15                  ;system call
+0000815E                           211          *display denominator
+0000815E  322F 0008                212          MOVE.W  8(A7),D1             ;initilize LENGTH in D1
+00008162  7003                     213          MOVE.L  #3,D0                ;task 3 to display number of keyboard
+00008164  4E4F                     214          TRAP    #15                  ;system call
+00008166                           215          
+00008166                           216          *display newline
+00008166  700D                     217          MOVE.L  #13,D0               ;task number for displaying string
+00008168  43F9 00008193            218          LEA     EMPTY,A1             ;point to EMPTY
+0000816E  4E4F                     219          TRAP    #15                  ;system call
+00008170                           220          
+00008170                           221          *quotient  =  8(A3)
+00008170                           222          *remainder = 10(A3)
+00008170                           223          
+00008170                           224          * end funciton
+00008170  4E75                     225          RTS                          ;return
+00008172                           226  
+00008172= 4D 61 78 69 6D 75 ...    227  MSGMAX   DC.B      'Maximum = ',0
+0000817D= 4D 69 6E 69 6D 75 ...    228  MSGMIN   DC.B      'Minimum = ',0
+00008188= 41 76 65 72 61 67 ...    229  MSGAVG   DC.B      'Average = ',0
+00008193= 20 00                    230  EMPTY    DC.B      ' ',0
+00008195                           231  
+00008195                           232  
+00008195                           233  
+00008195                           234  
+00008195                           235  
+00008195                           236  
+00009000                           237          ORG     $9000
+00009000                           238  LIST    DS.L      10                  ;list of numbers to average
+00009028                           239  LENGTH  DS.W      1                   ;size of list in words
+0000902A                           240  STRUCT  DS.L      3                   ;four members in struct, max, min, (quotient and remainder)
+00009036                           241          
+00009036                           242          END        MAIN
+
+No errors detected
+No warnings generated
+
+
+SYMBOL TABLE INFORMATION
+Symbol-name         Value
+-------------------------
+AVG                 80DA
+DATA                8020
+DIS                 80F6
+EMPTY               8193
+LENGTH              9028
+LIST                9000
+LOOP1               8048
+LOOP2               80AA
+LOOP3               80CA
+LOOP4               80E4
+MAIN                8000
+MAX                 80A2
+MIN                 80BA
+MSG0                805E
+MSG1                8086
+MSGAVG              8188
+MSGMAX              8172
+MSGMIN              817D
+NOMAX               80B4
+NOMIN               80D4
+STATS               8096
+STRUCT              902A

@@ -1,0 +1,58 @@
+00008000 Starting Address
+Assembler used: EASy68K Editor/Assembler v5.16.01
+Created On: 12/1/2022 3:07:12 PM
+
+00000000                             1  *-----------------------------------------------------------
+00000000                             2  * Title      : If Statement
+00000000                             3  * Written by : Gunteshwar Soin
+00000000                             4  * Date       : 19/10/2022
+00000000                             5  * Description: loops and arrays
+00000000                             6  *-----------------------------------------------------------
+00008000                             7          ORG     $8000
+00008000  103C 0000                  8  START   MOVE.B  #0,D0   ; i
+00008004  323C 0000                  9          MOVE.W  #0,D1   ; odd
+00008008  343C 0000                 10          MOVE.W  #0,D2   ; even
+0000800C  7E00                      11          MOVE.L  #0,D7   ; division
+0000800E  41F9 00009000             12          LEA     MY_SID,A0
+00008014                            13  
+00008014  0C40 0007                 14  LOOP    CMPI.W  #7,D0   ;D0 < 7
+00008018  6400 0020                 15          BHS     EXIT    ;break loop if false
+0000801C                            16          
+0000801C  4287                      17          CLR.L   D7
+0000801E  3E18                      18          MOVE.W  (A0)+,D7 ;move A0 to D7 for
+00008020  8FFC 0002                 19          DIVS    #2,D7   ;A % 2
+00008024  4847                      20          SWAP    D7      ;remainder swaped to lower word
+00008026                            21          
+00008026  0C47 0000                 22          CMPI.W  #0,D7   ;D7 == 0
+0000802A  6600 0008                 23          BNE     ODD
+0000802E                            24          
+0000802E  5242                      25  EVEN    ADD.W   #1,D2   ;even++
+00008030  6000 0004                 26          BRA     IDX
+00008034                            27  
+00008034  5241                      28  ODD     ADD.W   #1,D1   ;odd++
+00008036                            29          
+00008036  5200                      30  IDX     ADD.B   #1,D0   ; i++
+00008038  60DA                      31          BRA     LOOP    ; continue loop
+0000803A                            32  
+0000803A  4240                      33  EXIT    CLR.W   D0
+0000803C  4287                      34          CLR.L   D7
+0000803E  FFFF FFFF                 35          SIMHALT
+00008042                            36  
+00009000                            37          ORG     $9000
+00009000= 0001 0001 0007 0...       38  MY_SID  DC.W    1,1,7,8,2,5,7   ;id number array
+0000900E                            39          END     START
+
+No errors detected
+No warnings generated
+
+
+SYMBOL TABLE INFORMATION
+Symbol-name         Value
+-------------------------
+EVEN                802E
+EXIT                803A
+IDX                 8036
+LOOP                8014
+MY_SID              9000
+ODD                 8034
+START               8000

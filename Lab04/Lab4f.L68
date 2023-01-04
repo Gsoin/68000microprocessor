@@ -1,0 +1,42 @@
+00008000 Starting Address
+Assembler used: EASy68K Editor/Assembler v5.16.01
+Created On: 11/28/2022 6:50:25 AM
+
+00000000                             1  *-----------------------------------------------------------
+00000000                             2  * Title      : Lab4f
+00000000                             3  * Written by : Gunteshwar Soin
+00000000                             4  * Date       : 18/10/2022
+00000000                             5  * Description: Example of a conditional program
+00000000                             6  *-----------------------------------------------------------
+00000000                             7          
+00008000                             8          ORG     $8000
+00008000  41F9 00009000              9  START   LEA     LIST,A0          ;pointer to list
+00008006  4242                      10          CLR.W   D2               ;clear for use with ADD
+00008008  223C 00000008             11          MOVE.L  #INDEX,D1        ;initialize index counter
+0000800E  6700 0008                 12  AGAIN   BEQ     DONE             ;last word? goto DONE
+00008012  D458                      13          ADD.W   (A0)+,D2         ;add word
+00008014  5341                      14          SUB     #1,D1            ;decrement counter
+00008016  60F6                      15          BRA     AGAIN            ;do it again!
+00008018  33C2 00009010             16  DONE    MOVE.W  D2,SUM           ;store result
+0000801E                            17  
+0000801E  FFFF FFFF                 18          SIMHALT      
+00008022                            19  
+00009000                            20          ORG     $9000
+00009000= 0001 0002 0003 0...       21  LIST    DC.W    1,2,3,4,5,6,7,8  ;list of word values
+00009010                            22  SUM     DS.W    1                ;location of result
+00009012  =00000008                 23  INDEX   EQU     (SUM-LIST)/2     ;number of words in list
+00009012                            24          END     START
+
+No errors detected
+No warnings generated
+
+
+SYMBOL TABLE INFORMATION
+Symbol-name         Value
+-------------------------
+AGAIN               800E
+DONE                8018
+INDEX               8
+LIST                9000
+START               8000
+SUM                 9010

@@ -1,0 +1,38 @@
+00008000 Starting Address
+Assembler used: EASy68K Editor/Assembler v5.16.01
+Created On: 11/28/2022 6:50:33 AM
+
+00000000                             1  *-----------------------------------------------------------
+00000000                             2  * Title      : Lab4d
+00000000                             3  * Written by : Gunteshwar Soin
+00000000                             4  * Date       : 18/10/2022
+00000000                             5  * Description: Comparing numbers
+00000000                             6  *-----------------------------------------------------------
+00000000                             7          
+00008000                             8          ORG     $8000
+00008000  1039 00009001              9  START   MOVE.B  NUM2,D0          ;move NUM2 to register for
+00008006  B039 00009000             10          CMP.B   NUM1,D0          ;comparision with NUM1
+0000800C  6300 0008                 11          BLS     LESS             ;NUM2 <= NUM1? Then branch
+00008010  1A00                      12          MOVE.B  D0,D5            ;NUM2 greater? move to D5
+00008012  6000 0004                 13          BRA     EXIT             ;goto EXIT
+00008016  1C00                      14  LESS    MOVE.B  D0,D6            ;move to D6
+00008018                            15  
+00008018  FFFF FFFF                 16  EXIT    SIMHALT      
+0000801C                            17  
+00009000                            18          ORG  $9000
+00009000= 80                        19  NUM1    DC.B %10000000           ;variable NUM1
+00009001= 81                        20  NUM2    DC.B %10000001           ;variable NUM2
+00009002                            21          END  START
+
+No errors detected
+No warnings generated
+
+
+SYMBOL TABLE INFORMATION
+Symbol-name         Value
+-------------------------
+EXIT                8018
+LESS                8016
+NUM1                9000
+NUM2                9001
+START               8000

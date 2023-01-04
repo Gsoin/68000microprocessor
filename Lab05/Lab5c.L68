@@ -1,0 +1,51 @@
+00008000 Starting Address
+Assembler used: EASy68K Editor/Assembler v5.16.01
+Created On: 11/28/2022 6:59:45 AM
+
+00000000                             1  *-----------------------------------------------------------
+00000000                             2  * Title      : Lab5c
+00000000                             3  * Written by : Gunteshwar Soin
+00000000                             4  * Date       : 01/11/2022
+00000000                             5  * Description: Demonstration of subroutine call-return using
+00000000                             6  *              runtime stack (A7) to hold return address
+00000000                             7  *-----------------------------------------------------------
+00000000                             8          
+00008000                             9          ORG     $8000
+00008000                            10  
+00008000                            11  **** Main (calling) Code *****
+00008000                            12  
+00008000  700D                      13  START:  MOVE.L  #13,D0          ;task number for displaying string
+00008002  43F9 00008024             14          LEA     MSG0,A1         ;point to MSG0
+00008008  4E4F                      15          TRAP    #15             ;system call
+0000800A                            16          
+0000800A  6100 000E                 17          BSR     FOO             ;call subroutine foo()
+0000800E                            18          
+0000800E  43F9 00008074             19          LEA     MSG2,A1         ;point to MSG2
+00008014  4E4F                      20          TRAP    #15             ;system call
+00008016                            21  
+00008016  FFFF FFFF                 22          SIMHALT        
+0000801A                            23   
+0000801A                            24   
+0000801A                            25  **** Subroutine foo() *****       
+0000801A  43F9 0000803C             26  FOO     LEA     MSG1,A1         ;point to MSG1
+00008020  4E4F                      27          TRAP    #15             ;system call
+00008022  4E75                      28          RTS                     ;return to calling code
+00008024                            29  
+00008024= 31 2E 20 52 75 6E ...     30  MSG0    DC.B    '1. Running calling code',0
+0000803C= 32 2E 20 43 6F 6E ...     31  MSG1    DC.B    '2. Control passed from calling code to subroutine foo()', 0
+00008074= 33 2E 20 43 6F 6E ...     32  MSG2    DC.B    '3. Control passed from subroutne foo() back to calling code',0
+000080B0                            33                        
+000080B0                            34          END     START
+
+No errors detected
+No warnings generated
+
+
+SYMBOL TABLE INFORMATION
+Symbol-name         Value
+-------------------------
+FOO                 801A
+MSG0                8024
+MSG1                803C
+MSG2                8074
+START               8000

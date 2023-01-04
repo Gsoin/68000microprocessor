@@ -1,0 +1,67 @@
+00008000 Starting Address
+Assembler used: EASy68K Editor/Assembler v5.16.01
+Created On: 11/28/2022 7:08:48 AM
+
+00000000                             1  *-----------------------------------------------------------
+00000000                             2  * Title      : Lab7a
+00000000                             3  * Written by : Your name goes here
+00000000                             4  * Date       : dd/mm/yyyy
+00000000                             5  * Description: Computes the sum of the square of two numbers 
+00000000                             6  *              using the formula c = a^2 + b^2  
+00000000                             7  *-----------------------------------------------------------
+00000000                             8  
+00000000  =0000000E                  9  aOffset     EQU     14              ;displacement from frame pointer
+00000000  =0000000C                 10  bOffset     EQU     12              ;displacement from frame pointer
+00000000  =00000008                 11  cOffset     EQU     8               ;displacement from frame pointer
+00000000  =FFFFFFFC                 12  xOffset     EQU     -4              ;displacement from frame pointer
+00000000  =FFFFFFF8                 13  yOffset     EQU     -8              ;displacement from frame pointer
+00000000                            14  
+00000000                            15  
+00008000                            16          ORG     $8000
+00008000                            17  
+00008000  3F3C 0004                 18  main    MOVE.W  #4,-(A7)            ;push a = 4         
+00008004  3F3C 0005                 19          MOVE.W  #5,-(A7)            ;push b = 5 
+00008008  4879 00009000             20          PEA     c                   ;push address of c 
+0000800E  6100 000A                 21          BSR     sumSquare           ;call subroutine
+00008012  4FEF 0008                 22          LEA     8(A7),A7            ;remove parameters from stack
+00008016                            23          
+00008016  FFFF FFFF                 24          SIMHALT
+0000801A                            25     
+0000801A                            26        
+0000801A                            27  sumSquare   
+0000801A  4E56 FFF8                 28          LINK    A6,#-8              ;allocate storage for two longwords
+0000801E  48E7 8080                 29          MOVEM.L A0/D0,-(A7)         ;save working registers
+00008022  302E 000E                 30          MOVE.W  aOffset(A6),D0      ;get a
+00008026  C1C0                      31          MULS    D0,D0               ;compute a * a
+00008028  2D40 FFFC                 32          MOVE.L  D0,xOffset(A6)      ;x = a * a   
+0000802C  302E 000C                 33          MOVE.W  bOffset(A6),D0      ;get b
+00008030  C1C0                      34          MULS    D0,D0               ;compute b * b
+00008032  2D40 FFF8                 35          MOVE.L  D0,yOffset(A6)      ;y = b * b 
+00008036  206E 0008                 36          MOVEA.L cOffset(A6),A0      ;get address of c
+0000803A  202E FFFC                 37          MOVE.L  xOffset(A6),D0      ;get x
+0000803E  D0AE FFF8                 38          ADD.L   yOffset(A6),D0      ;add x + y
+00008042  2080                      39          MOVE.L  D0,(A0)             ;save in c
+00008044  4CDF 0101                 40          MOVEM.L (A7)+,A0/D0         ;restore working registers
+00008048  4E5E                      41          UNLK    A6                  ;deallocate stack frame
+0000804A  4E75                      42          RTS                         ;return to caller
+0000804C                            43  
+00009000                            44          ORG     $9000
+00009000                            45  c       DS.L    1                    ;variable c
+00009004                            46         
+00009004                            47          END     main
+
+No errors detected
+No warnings generated
+
+
+SYMBOL TABLE INFORMATION
+Symbol-name         Value
+-------------------------
+AOFFSET             E
+BOFFSET             C
+C                   9000
+COFFSET             8
+MAIN                8000
+SUMSQUARE           801A
+XOFFSET             FFFFFFFC
+YOFFSET             FFFFFFF8

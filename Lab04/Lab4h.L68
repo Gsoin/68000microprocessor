@@ -1,0 +1,50 @@
+00008000 Starting Address
+Assembler used: EASy68K Editor/Assembler v5.16.01
+Created On: 12/1/2022 2:37:08 PM
+
+00000000                             1  *-----------------------------------------------------------
+00000000                             2  * Title      : If Statement
+00000000                             3  * Written by : Gunteshwar Soin
+00000000                             4  * Date       : 18/10/2022
+00000000                             5  * Description: sets values A and B to C if A == B
+00000000                             6  *              if not then swap A and B
+00000000                             7  *-----------------------------------------------------------
+00008000                             8          ORG     $8000
+00008000  1239 00009000              9  START   MOVE.B  A,D1
+00008006  1439 00009001             10          MOVE.B  B,D2
+0000800C  B202                      11          CMP.B   D2,D1
+0000800E  6600 001A                 12          BNE     ISNOTZ
+00008012                            13          
+00008012  13F9 00009002 00009000    14          MOVE.B  C,A     ;A == B
+0000801C  13F9 00009002 00009001    15          MOVE.B  C,B
+00008026                            16  
+00008026  6000 001A                 17          BRA EXIT
+0000802A  1039 00009000             18  ISNOTZ  MOVE.B  A,D0    ;A != B
+00008030  13F9 00009001 00009000    19          MOVE.B  B,A
+0000803A  13C0 00009001             20          MOVE.B  D0,B
+00008040  4200                      21          CLR.B   D0
+00008042  4201                      22  EXIT    CLR.B   D1
+00008044  4202                      23          CLR.B   D2
+00008046                            24      
+00008046                            25       
+00008046  FFFF FFFF                 26          SIMHALT
+0000804A                            27  
+00009000                            28          ORG     $9000
+00009000= 01                        29  A       DC.B    1
+00009001= 01                        30  B       DC.B    1
+00009002= 08                        31  C       DC.B    8
+00009003                            32          END    START
+
+No errors detected
+No warnings generated
+
+
+SYMBOL TABLE INFORMATION
+Symbol-name         Value
+-------------------------
+A                   9000
+B                   9001
+C                   9002
+EXIT                8042
+ISNOTZ              802A
+START               8000

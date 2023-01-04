@@ -1,0 +1,115 @@
+00008000 Starting Address
+Assembler used: EASy68K Editor/Assembler v5.16.01
+Created On: 11/28/2022 7:06:28 AM
+
+00000000                             1  *-----------------------------------------------------------
+00000000                             2  * Title      : Lab7c
+00000000                             3  * Written by : Gunteshwar Soin
+00000000                             4  * Date       : 09/11/2022
+00000000                             5  * Description: Computes c=(a+b)^2
+00000000                             6  *-----------------------------------------------------------
+00000000                             7  
+00000000  =FFFFFFFE                  8  xOffset     EQU     -2              ;displacement from frame pointer
+00000000  =FFFFFFFC                  9  yOffset     EQU     -4              ;displacement from frame pointer
+00000000  =FFFFFFFA                 10  zOffset     EQU     -6              ;displacement from frame pointer
+00000000  =0000000E                 11  aOffset     EQU     14              ;displacement from frame pointer
+00000000  =0000000C                 12  bOffset     EQU     12              ;displacement from frame pointer
+00000000  =00000008                 13  cOffset     EQU      8              ;displacement from frame pointer
+00000000                            14  
+00000000                            15  
+00000000                            16  *
+00000000                            17  * Prologue: Prompt user to enter a and b, then compute (a+b)^2 
+00000000                            18  *
+00000000                            19  
+00008000                            20          ORG     $8000
+00008000  43F9 00009000             21  main    LEA     MSGA,A1             ;initalize pointer to string
+00008006  303C 000E                 22          MOVE    #14,D0              ;print string is task 14
+0000800A  4E4F                      23          TRAP    #15                 ;system call
+0000800C  303C 0004                 24          MOVE    #4,D0               ;read integer from keyboard is task 4
+00008010  4E4F                      25          TRAP    #15                 ;get value of a
+00008012  3F01                      26          MOVE.W  D1,-(A7)            ;push a onto stack  
+00008014                            27          
+00008014  43F9 0000900A             28          LEA     MSGB,A1             ;initalize pointer to string
+0000801A  303C 000E                 29          MOVE    #14,D0              ;print string is task 14
+0000801E  4E4F                      30          TRAP    #15                 ;system call
+00008020  303C 0004                 31          MOVE    #4,D0               ;read integer from keyboard is task 4
+00008024  4E4F                      32          TRAP    #15                 ;get value of b
+00008026  3F01                      33          MOVE.W  D1,-(A7)            ;push b onto stack 
+00008028                            34          
+00008028  4879 00009022             35          PEA     C                   ;push address of c onto stack
+0000802E                            36  
+0000802E                            37  call_sumSquared
+0000802E  6100 0022                 38          BSR     sumSquared          ;call subroutine
+00008032  4FEF 0008                 39          LEA     8(A7),A7            ;remove parameter from stack
+00008036                            40  
+00008036  43F9 00009014             41          LEA     MSG2,A1             ;initilaize pointer to string
+0000803C  303C 000E                 42          MOVE    #14,D0              ;print string is task 14
+00008040  4E4F                      43          TRAP    #15                 ;system call
+00008042  303C 0003                 44          MOVE    #3,D0               ;display integer is task 3
+00008046  3239 00009022             45          MOVE.W  C,D1
+0000804C  4E4F                      46          TRAP    #15                 ;system call
+0000804E                            47          
+0000804E  FFFF FFFF                 48          SIMHALT
+00008052                            49  
+00008052                            50  *
+00008052                            51  * sumSquared (a,b,*c)
+00008052                            52  *  - see above for offsets
+00008052                            53  *  - value of (a+b)^2 is stored at c
+00008052                            54  
+00008052                            55  sumSquared 
+00008052  4E56 FFFA                 56          LINK    A6,#-6               ;allocate storage sum
+00008056  48E7 8080                 57          MOVEM.L  A0/D0,-(A7)         ;save working register
+0000805A                            58          
+0000805A  302E 000E                 59          MOVE.W  aOffset(A6),D0      ;move a to D0
+0000805E  C1C0                      60          MULS.W  D0,D0               ;a * a
+00008060  3D40 FFFE                 61          MOVE.W  D0,xOffset(A6)      ;save x = a * a
+00008064                            62          
+00008064  302E 000C                 63          MOVE.W  bOffset(A6),D0      ;move b to D0
+00008068  C1C0                      64          MULS.W  D0,D0               ;b * b
+0000806A  3D40 FFFC                 65          MOVE.W  D0,yOffset(A6)      ;save y = b * b
+0000806E                            66          
+0000806E  302E 000E                 67          MOVE.W  aOffset(A6),D0      ;move a to D0
+00008072  C1EE 000C                 68          MULS.W  bOffset(A6),D0      ;a * b
+00008076  C1FC 0002                 69          MULS.W  #2,D0               ;2 * a * b
+0000807A  3D40 FFFA                 70          MOVE.W  D0,zOffset(A6)      ;save z = 2 * a * b
+0000807E                            71          
+0000807E  302E FFFE                 72          MOVE.W  xOffset(A6),D0      ;move x to D0
+00008082  D06E FFFC                 73          ADD.W   yOffset(A6),D0      ;x + y
+00008086  D06E FFFA                 74          ADD.W   zOffset(A6),D0      ;x + y + z
+0000808A                            75          
+0000808A  206E 0008                 76          MOVEA.L cOffset(A6),A0      ;get address of c
+0000808E  3080                      77          MOVE.W  D0,(A0)             ;*c = x + y + z
+00008090                            78          
+00008090  4CDF 0101                 79  L2      MOVEM.L  (A7)+,A0/D0        ;restore working register
+00008094  4E5E                      80          UNLK    A6                  ;deallocate stack frame
+00008096  4E75                      81          RTS                         ;return value of sumSquared(a,b) in D1
+00008098                            82  
+00009000                            83          ORG $9000
+00009000= 45 6E 74 65 72 20 ...     84  MSGA    DC.B 'Enter a: ',0
+0000900A= 45 6E 74 65 72 20 ...     85  MSGB    DC.B 'Enter b: ',0
+00009014= 53 75 6D 20 53 71 ...     86  MSG2    DC.B 'Sum Squared: ',0
+00009022                            87  C       DS.W 1
+00009024                            88  
+00009024                            89          END     main
+
+No errors detected
+No warnings generated
+
+
+SYMBOL TABLE INFORMATION
+Symbol-name         Value
+-------------------------
+AOFFSET             E
+BOFFSET             C
+C                   9022
+CALL_SUMSQUARED     802E
+COFFSET             8
+L2                  8090
+MAIN                8000
+MSG2                9014
+MSGA                9000
+MSGB                900A
+SUMSQUARED          8052
+XOFFSET             FFFFFFFE
+YOFFSET             FFFFFFFC
+ZOFFSET             FFFFFFFA

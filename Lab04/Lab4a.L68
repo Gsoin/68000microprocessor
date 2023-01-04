@@ -1,0 +1,29 @@
+00008000 Starting Address
+Assembler used: EASy68K Editor/Assembler v5.16.01
+Created On: 11/28/2022 6:50:41 AM
+
+00000000                             1  *-----------------------------------------------------------
+00000000                             2  * Title      : Lab4a
+00000000                             3  * Written by : Gunteshwar Soin
+00000000                             4  * Date       : 18/10/2022
+00000000                             5  * Description: 8-bit and 16-bit branch encodings
+00000000                             6  *-----------------------------------------------------------
+00000000                             7          
+00008000                             8          ORG    $8000
+00008000  6000 007E                  9  L1      BRA    L2       ;8-bit  branch forward
+00008080                            10          ORG    $8080
+00008080  6000 017E                 11  L2      BRA    L3       ;16-bit branch forward
+00008200                            12          ORG    $8200
+00008200  6000 FDFE                 13  L3      BRA    L1       ;16-bit branch backward
+00008204                            14          END    $8000
+
+No errors detected
+No warnings generated
+
+
+SYMBOL TABLE INFORMATION
+Symbol-name         Value
+-------------------------
+L1                  8000
+L2                  8080
+L3                  8200

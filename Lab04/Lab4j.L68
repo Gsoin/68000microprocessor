@@ -1,0 +1,55 @@
+00008000 Starting Address
+Assembler used: EASy68K Editor/Assembler v5.16.01
+Created On: 12/1/2022 3:02:39 PM
+
+00000000                             1  *-----------------------------------------------------------
+00000000                             2  * Title      : If Statement
+00000000                             3  * Written by : Gunteshwar Soin
+00000000                             4  * Date       : 19/10/2022
+00000000                             5  * Description: sets values A and B to C if A > B
+00000000                             6  *              if not then swap A and B
+00000000                             7  *-----------------------------------------------------------
+00008000                             8          ORG     $8000
+00008000  3239 00009000              9  START   MOVE.W  A,D1
+00008006                            10  
+00008006  0C41 0000                 11  CON1    CMPI.W  #0,D1   ;A >= 0
+0000800A  6500 000A                 12          BLO     CON2
+0000800E                            13          
+0000800E  0C41 0064                 14          CMPI.W  #100,D1 ;A > 100
+00008012  6300 0002                 15          BLS     CON2    ;branch if passed A <= 100
+00008016                            16  
+00008016                            17  
+00008016  0C41 0320                 18  CON2    CMPI.W  #800,D1 ;A >= 800
+0000801A  6500 0016                 19          BLO     FAIL
+0000801E                            20          
+0000801E  0C41 0384                 21          CMPI.W  #900,D1 ;A <= 900
+00008022  6200 000E                 22          BHI     FAIL
+00008026                            23          
+00008026  33FC 0001 00009002        24  SUCCESS MOVE.W  #1,B
+0000802E  6000 000A                 25          BRA     EXIT
+00008032                            26  
+00008032  33FC 0000 00009002        27  FAIL    MOVE.W  #0,B
+0000803A                            28  
+0000803A  4241                      29  EXIT    CLR.W   D1
+0000803C  FFFF FFFF                 30          SIMHALT
+00008040                            31  
+00009000                            32          ORG     $9000
+00009000= 0063                      33  A       DC.W    99
+00009002                            34  B       DS.W    1
+00009004                            35          END    START
+
+No errors detected
+No warnings generated
+
+
+SYMBOL TABLE INFORMATION
+Symbol-name         Value
+-------------------------
+A                   9000
+B                   9002
+CON1                8006
+CON2                8016
+EXIT                803A
+FAIL                8032
+START               8000
+SUCCESS             8026

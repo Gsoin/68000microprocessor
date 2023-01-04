@@ -1,0 +1,47 @@
+00008000 Starting Address
+Assembler used: EASy68K Editor/Assembler v5.16.01
+Created On: 11/28/2022 6:59:31 AM
+
+00000000                             1  *-----------------------------------------------------------
+00000000                             2  * Title      : Lab5d
+00000000                             3  * Written by : Gunteshwar Soin
+00000000                             4  * Date       : 01/11/2022
+00000000                             5  * Description: An example of preserving register values
+00000000                             6  *              upon entry and exit from a subroutine
+00000000                             7  *-----------------------------------------------------------
+00000000                             8          
+00008000                             9          ORG     $8000
+00008000                            10  
+00008000                            11  **** Main (calling) Code *****
+00008000                            12  
+00008000  223C D1D1D1D1             13  START:  MOVE.L  #$D1D1D1D1,D1       ;initialize registers
+00008006  243C D2D2D2D2             14          MOVE.L  #$D2D2D2D2,D2       ;with easy to recognize
+0000800C  263C D3D3D3D3             15          MOVE.L  #$D3D3D3D3,D3       ;values
+00008012  287C A4A4A4A4             16          MOVEA.L #$A4A4A4A4,A4
+00008018  2A7C A5A5A5A5             17          MOVEA.L #$A5A5A5A5,A5
+0000801E                            18          
+0000801E  6100 0006                 19          BSR     FOO                 ;call subroutine
+00008022                            20  
+00008022  FFFF FFFF                 21          SIMHALT
+00008026                            22  
+00008026                            23  
+00008026                            24  **** Subroutine foo() ****
+00008026                            25  
+00008026  48E7 700C                 26  FOO     MOVEM.L D1-D3/A4-A5,-(A7)   ;save working registers
+0000802A  4CF9 300E 00008038        27          MOVEM.L zero,D1-D3/A4-A5    ;simulate use of registers
+00008032  4CDF 300E                 28          MOVEM.L (A7)+,D1-D3/A4-A5   ;restore working registers
+00008036  4E75                      29          RTS                         ;return to calling code     
+00008038                            30  
+00008038= 00000000 00000000 ...     31  ZERO    DC.L    0,0,0,0,0           
+0000804C                            32          END     START
+
+No errors detected
+No warnings generated
+
+
+SYMBOL TABLE INFORMATION
+Symbol-name         Value
+-------------------------
+FOO                 8026
+START               8000
+ZERO                8038

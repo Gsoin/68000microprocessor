@@ -1,0 +1,51 @@
+00008000 Starting Address
+Assembler used: EASy68K Editor/Assembler v5.16.01
+Created On: 11/01/2022 04:23:10 PM
+
+00000000                             1  *-----------------------------------------------------------
+00000000                             2  * Title      : Lab5a
+00000000                             3  * Written by : Your name goes here
+00000000                             4  * Date       : dd/mm/yyyy
+00000000                             5  * Description: Push and Pop Operations involving the
+00000000                             6  *              runtime stack (A7)
+00000000                             7  *-----------------------------------------------------------
+00000000                             8          
+00008000                             9          ORG     $8000
+00008000                            10  
+00008000                            11  * Initialize registers with values that are easy to recognize
+00008000                            12  * when viewed on the stack
+00008000                            13  
+00008000  203C D0D0D0D0             14  START:  MOVE.L  #$D0D0D0D0,D0   ;initialize D0
+00008006  323C D1D1                 15          MOVE.W  #$D1D1,D1       ;initialize D1
+0000800A  143C 00D2                 16          MOVE.B  #$D2,D2         ;initialize D2
+0000800E  43F9 A1A1A1A1             17          LEA     $A1A1A1A1,A1    ;initialize A1
+00008014                            18          
+00008014                            19  * Save previous values on the (runtime) stack in sequence 
+00008014                            20   
+00008014  2F00                      21          MOVE.L  D0,-(A7)        ;push long word in D0 
+00008016  3F01                      22          MOVE.W  D1,-(A7)        ;push word in D1
+00008018  1F02                      23          MOVE.B  D2,-(A7)        ;push byte in D2
+0000801A                            24  
+0000801A                            25  * Restore previous values from stack in reverse order         
+0000801A                            26  
+0000801A  141F                      27          MOVE.B  (A7)+,D2        ;pop 8-bit value into D2
+0000801C  321F                      28          MOVE.W  (A7)+,D1        ;pop 8-bit value in D1
+0000801E  201F                      29          MOVE.L  (A7)+,D0        ;pop 32-bit value in D0
+00008020                            30        
+00008020                            31  * Save/restore D1 and A1 using a single push/pop instruction      
+00008020                            32  
+00008020  48E7 4040                 33          MOVEM.L A1/D1,-(A7)     ;push 32-bit values in A1 and D1
+00008024  43F8 0000                 34          LEA     0,A1            ;clear A1  
+00008028  4281                      35          CLR.L   D1              ;clear D1
+0000802A  4CDF 0202                 36          MOVEM.L (A7)+,A1/D1     ;pop 32-bit values into D1 and A1 
+0000802E                            37                  
+0000802E                            38          END     START
+
+No errors detected
+No warnings generated
+
+
+SYMBOL TABLE INFORMATION
+Symbol-name         Value
+-------------------------
+START               8000

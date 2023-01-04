@@ -1,0 +1,93 @@
+00008000 Starting Address
+Assembler used: EASy68K Editor/Assembler v5.16.01
+Created On: 12/1/2022 3:45:44 PM
+
+00000000                             1  *-----------------------------------------------------------
+00000000                             2  * Title      : Lab7d
+00000000                             3  * Written by : Gunteshwar Soin
+00000000                             4  * Date       : 09/11/2022
+00000000                             5  * Description: displays integer n recursively
+00000000                             6  *-----------------------------------------------------------
+00000000                             7  
+00000000  =FFFFFFFE                  8  quotientOffset     EQU     -2              ;displacement from frame pointer
+00000000  =FFFFFFFC                  9  remainderOffset     EQU     -4              ;displacement from frame pointer
+00000000  =00000008                 10  nOffset     EQU      8              ;displacement from frame pointer
+00000000                            11  
+00000000                            12  
+00000000                            13  *
+00000000                            14  * Prologue: Prompt user to enter a and b, then compute (a+b)^2 
+00000000                            15  *
+00000000                            16  
+00008000                            17          ORG     $8000
+00008000  43F9 00009000             18  main    LEA     MSGN,A1             ;initalize pointer to string
+00008006  303C 000E                 19          MOVE    #14,D0              ;print string is task 14
+0000800A  4E4F                      20          TRAP    #15                 ;system call
+0000800C  303C 0004                 21          MOVE    #4,D0               ;read integer from keyboard is task 4
+00008010  4E4F                      22          TRAP    #15                 ;get value of a
+00008012  3F01                      23          MOVE.W  D1,-(A7)            ;push n onto stack  
+00008014                            24  
+00008014                            25  call_display
+00008014  6100 000A                 26          BSR     display             ;call subroutine
+00008018  4FEF 0002                 27          LEA     2(A7),A7            ;remove parameter from stack
+0000801C                            28          
+0000801C  FFFF FFFF                 29          SIMHALT
+00008020                            30  
+00008020                            31  *
+00008020                            32  * display (n)
+00008020                            33  *  - see above for offsets
+00008020                            34  *
+00008020                            35  
+00008020                            36  display 
+00008020  4E56 FFFC                 37          LINK    A6,#-4               ;allocate storage sum
+00008024  48E7 8080                 38          MOVEM.L  A0/D0,-(A7)         ;save working register
+00008028  4280                      39          CLR.L   D0
+0000802A                            40          
+0000802A                            41          *
+0000802A                            42          *   if (!n): return
+0000802A                            43          *
+0000802A                            44          
+0000802A  0C6E 0000 0008            45          CMPI    #0,nOffset(A6)      ;is n=0?
+00008030  6600 0006                 46          BNE     L1                  ;no
+00008034                            47  *
+00008034                            48  *       return
+00008034                            49  *
+00008034  6000 001E                 50          BRA     L2                  ;return
+00008038                            51  *
+00008038                            52  *       display(n)
+00008038                            53  *        
+00008038  302E 0008                 54  L1      MOVE.W  nOffset(A6),D0              ;get n
+0000803C  81FC 000A                 55          DIVS    #10,D0                      ;compute n/10 and n%10
+00008040  2D40 FFFC                 56          MOVE.L  D0,remainderOffset(A6)      ;fill remainder and quotient
+00008044                            57          
+00008044  3F2E FFFE                 58          MOVE.W  quotientOffset(A6),-(A7)            ;push quotient to stack
+00008048  61D6                      59          BSR     display                     ;call display(n)
+0000804A                            60          
+0000804A  322E FFFC                 61          MOVE.W  remainderOffset(A6),D1  ;get remainder ready to display
+0000804E  303C 0003                 62          MOVE    #3,D0               ;display integer is task 3
+00008052  4E4F                      63          TRAP    #15                 ;system call
+00008054                            64          
+00008054  4CDF 0101                 65  L2      MOVEM.L  (A7)+,A0/D0        ;restore working register
+00008058  4E5E                      66          UNLK    A6                  ;deallocate stack frame
+0000805A  4E75                      67          RTS                         ;return value of sumSquared(a,b) in D1
+0000805C                            68  
+00009000                            69          ORG $9000
+00009000= 45 6E 74 65 72 20 ...     70  MSGN    DC.B 'Enter n: ',0
+0000900A                            71  
+0000900A                            72          END     main
+
+No errors detected
+No warnings generated
+
+
+SYMBOL TABLE INFORMATION
+Symbol-name         Value
+-------------------------
+CALL_DISPLAY        8014
+DISPLAY             8020
+L1                  8038
+L2                  8054
+MAIN                8000
+MSGN                9000
+NOFFSET             8
+QUOTIENTOFFSET      FFFFFFFE
+REMAINDEROFFSET     FFFFFFFC

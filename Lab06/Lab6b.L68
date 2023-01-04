@@ -1,0 +1,95 @@
+00008000 Starting Address
+Assembler used: EASy68K Editor/Assembler v5.16.01
+Created On: 11/09/2022 02:05:14 PM
+
+00000000                             1  *-----------------------------------------------------------
+00000000                             2  * Title      : Lab7b
+00000000                             3  * Written by : Jacob Mckenna
+00000000                             4  * Date       : 09/11/2022
+00000000                             5  * Description: Computes n! recursively 
+00000000                             6  *-----------------------------------------------------------
+00000000                             7  
+00000000  =00000008                  8  nOffset     EQU      8              ;displacement from frame pointer
+00000000  =FFFFFFFE                  9  factOffset  EQU     -2              ;displacement from frame pointer
+00000000                            10  
+00000000                            11  
+00000000                            12  *
+00000000                            13  * Prologue: Prompt user to enter n, then compute n! 
+00000000                            14  *
+00000000                            15  
+00008000                            16          ORG     $8000
+00008000  43F9 00009000             17  main    LEA     MSG,A1              ;initalize pointer to string
+00008006  303C 000E                 18          MOVE    #14,D0              ;print string is task 14
+0000800A  4E4F                      19          TRAP    #15                 ;system call
+0000800C  303C 0004                 20          MOVE    #4,D0               ;read integer from keyboard is task 4
+00008010  4E4F                      21          TRAP    #15                 ;get value of n 
+00008012                            22  
+00008012                            23  call_factorial        
+00008012  3F01                      24          MOVE.W  D1,-(A7)            ;push n onto stack         
+00008014  6100 001C                 25          BSR     factorial           ;call subroutine
+00008018  4FEF 0002                 26          LEA     2(A7),A7            ;remove parameter from stack
+0000801C                            27  
+0000801C  43F9 0000900A             28          LEA     MSG2,A1             ;initilaize pointer to string
+00008022  303C 000E                 29          MOVE    #14,D0              ;print string is task 14
+00008026  4E4F                      30          TRAP    #15                 ;system call
+00008028  303C 0003                 31          MOVE    #3,D0               ;display integer is task 3
+0000802C  4E4F                      32          TRAP    #15                 ;system call
+0000802E                            33          
+0000802E  FFFF FFFF                 34          SIMHALT
+00008032                            35  
+00008032                            36  *
+00008032                            37  * Factorial (n)
+00008032                            38  *  - parameter n is at 8(A6)
+00008032                            39  *  - local variable fact is at -2(A6)
+00008032                            40  *  - value of factorial(n) returned in D1
+00008032                            41  
+00008032                            42  factorial    
+00008032  4E56 FFFE                 43          LINK    A6,#-2              ;allocate storage fact
+00008036  2F00                      44          MOVE.L  D0,-(A7)            ;save working register
+00008038                            45  *
+00008038                            46  *       if (n == 1)
+00008038                            47  *
+00008038  0C6E 0000 0008            48          CMPI    #0,nOffset(A6)      ;is n=0?
+0000803E  6600 000A                 49          BNE     L1                  ;no
+00008042                            50  *
+00008042                            51  *       return 1
+00008042                            52  *
+00008042  323C 0001                 53          MOVE    #1,D1               ;factorial(0) = 1
+00008046  6000 0018                 54          BRA     L2                  ;return
+0000804A                            55  *
+0000804A                            56  *       fact = n x factorial(n-1)
+0000804A                            57  *        
+0000804A  302E 0008                 58  L1      MOVE.W  nOffset(A6),D0      ;get n
+0000804E  3D40 FFFE                 59          MOVE.W  D0,factOffset(A6)   ;fact = n
+00008052  5340                      60          SUB.W   #1,D0               ;compute n-1
+00008054  3F00                      61          MOVE.W  D0,-(A7)            ;push n-1
+00008056  61DA                      62          BSR     factorial           ;calculate factorial(n-1)
+00008058  C2EE FFFE                 63          MULU    factOffset(A6),D1   ;compute n x factorial(n-1)
+0000805C  4FEF 0002                 64          LEA     2(A7),A7            ;remove n-1
+00008060                            65  *}        
+00008060  201F                      66  L2      MOVE.L  (A7)+,D0            ;restore working register               
+00008062  4E5E                      67          UNLK    A6                  ;deallocate stack frame
+00008064  4E75                      68          RTS                         ;return value of factorial(n) in D1
+00008066                            69  
+00009000                            70          ORG $9000
+00009000= 45 6E 74 65 72 20 ...     71  MSG     DC.B 'Enter n: ',0
+0000900A= 46 61 63 74 6F 72 ...     72  MSG2    DC.B 'Factorial: ',0
+00009016                            73  
+00009016                            74          END     main
+
+No errors detected
+No warnings generated
+
+
+SYMBOL TABLE INFORMATION
+Symbol-name         Value
+-------------------------
+CALL_FACTORIAL      8012
+FACTOFFSET          FFFFFFFE
+FACTORIAL           8032
+L1                  804A
+L2                  8060
+MAIN                8000
+MSG                 9000
+MSG2                900A
+NOFFSET             8
